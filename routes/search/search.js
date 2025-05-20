@@ -35,6 +35,7 @@ router.get("/search", async (req, res) => {
             id: true,
             title: true,
             description: true,
+            imageUrl: true,
             numOfPages: true,
             genre: true,
             author: {

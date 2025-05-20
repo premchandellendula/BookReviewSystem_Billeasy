@@ -8,6 +8,7 @@ const prisma = new PrismaClient()
 const bookBody = zod.object({
     title: zod.string(),
     description: zod.string(),
+    imageUrl: zod.string(),
     numOfPages: zod.number(),
     genre: zod.string()
 })
@@ -21,13 +22,14 @@ router.post('/books', authMiddleware, async (req, res) => {
         })
     }
 
-    const { title, description, numOfPages, genre } = req.body
+    const { title, description, imageUrl, numOfPages, genre } = req.body
 
     try{
         const book = await prisma.book.create({
             data: {
                 title,
                 description,
+                imageUrl,
                 numOfPages,
                 genre,
                 authorId: req.userId
@@ -83,6 +85,7 @@ router.get('/books', async (req, res) => {
                 id: true,
                 title: true,
                 description: true,
+                imageUrl: true,
                 numOfPages: true,
                 genre: true,
                 author: {
@@ -131,6 +134,7 @@ router.get('/books/:id', async (req, res) => {
                 id: true,
                 title: true,
                 description: true,
+                imageUrl: true,
                 numOfPages: true,
                 genre: true,
                 author: {
@@ -170,9 +174,11 @@ router.get('/books/:id', async (req, res) => {
 
         res.status(200).json({
             message: "Book fetched successfully",
-            ...book, 
-            averageRating: ratingAgg._avg.rating ?? 0,
-            reviews
+            book: {
+                ...book, 
+                averageRating: ratingAgg._avg.rating ?? 0,
+                reviews
+            }
         })
     }catch(err){
         return res.status(500).json({
